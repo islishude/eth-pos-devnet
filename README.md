@@ -13,7 +13,7 @@ Refer to https://docs.prylabs.network/docs/advanced/proof-of-stake-devnet for th
 **Clean and reset all data**
 
 ```
-make clean
+make reset
 ```
 
 **Init genesis**
