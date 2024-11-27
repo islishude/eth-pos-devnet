@@ -29,10 +29,7 @@ services:
     volumes:
       - ./data/geth:/root/.ethereum
     logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "10"
+      driver: "local"
 
   beacon-chain:
     image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v5.1.2"
@@ -59,10 +56,7 @@ services:
       - ./data/geth:/geth
       - ./config/config.yml:/config/config.yml:ro
     logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "10"
+      driver: "local"
 
   validator:
     image: "gcr.io/prysmaticlabs/prysm/validator:v5.1.2"
@@ -80,7 +74,4 @@ services:
       - ./data/prysm:/prysm
       - ./config/config.yml:/config/config.yml:ro
     logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "10"
+      driver: "local"
