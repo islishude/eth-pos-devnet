@@ -2,7 +2,7 @@ name: devnet-genesis
 
 services:
   custom-geth-genesis:
-    image: "node:20-alpine"
+    image: "node:22-alpine"
     working_dir: /genesis
     # 2.24.0 required
     env_file:
@@ -15,7 +15,7 @@ services:
     entrypoint: ["node", "index.mjs"]
 
   create-beacon-chain-genesis:
-    image: "gcr.io/prysmaticlabs/prysm/cmd/prysmctl:v5.0.3"
+    image: "gcr.io/prysmaticlabs/prysm/cmd/prysmctl:v5.1.2"
     command:
       - testnet
       - generate-genesis
@@ -35,8 +35,8 @@ services:
         condition: service_completed_successfully
 
   init-geth-genesis:
-    image: "ethereum/client-go:v1.14.5"
-    command: init --cache.preimages=true --datadir /geth /geth/genesis.json
+    image: "ethereum/client-go:v1.14.12"
+    command: init --cache.preimages=true --state.scheme=hash --datadir /geth /geth/genesis.json
     volumes:
       - ./data/geth:/geth
     depends_on:

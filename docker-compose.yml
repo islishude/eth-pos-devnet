@@ -2,7 +2,7 @@ name: devnet
 
 services:
   geth:
-    image: "ethereum/client-go:v1.14.8"
+    image: "ethereum/client-go:v1.14.12"
     command:
       - --networkid=48815
       - --nodiscover
@@ -17,6 +17,7 @@ services:
       - --ws.origins=*
       - --syncmode=full
       - --gcmode=archive
+      - --state.scheme=hash
       - --history.transactions=0
       - --history.state=0
     ports:
@@ -34,7 +35,7 @@ services:
         max-file: "10"
 
   beacon-chain:
-    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v5.0.3"
+    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v5.1.2"
     command:
       - --datadir=/prysm/beacondata
       - --min-sync-peers=0
@@ -64,7 +65,7 @@ services:
         max-file: "10"
 
   validator:
-    image: "gcr.io/prysmaticlabs/prysm/validator:v5.0.3"
+    image: "gcr.io/prysmaticlabs/prysm/validator:v5.1.2"
     command:
       - --beacon-rpc-provider=beacon-chain:4000
       - --datadir=/prysm/validatordata
