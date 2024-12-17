@@ -15,7 +15,7 @@ services:
     entrypoint: ["node", "index.mjs"]
 
   create-beacon-chain-genesis:
-    image: "gcr.io/prysmaticlabs/prysm/cmd/prysmctl:v5.1.2"
+    image: "gcr.io/prysmaticlabs/prysm/cmd/prysmctl:v5.2.0"
     command:
       - testnet
       - generate-genesis
