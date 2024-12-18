@@ -16,8 +16,7 @@
     "grayGlacierBlock": 0,
     "shanghaiTime": 0,
     "cancunTime": 0,
-    "terminalTotalDifficulty": 0,
-    "terminalTotalDifficultyPassed": true
+    "terminalTotalDifficulty": 0
   },
   "nonce": "0x0",
   "timestamp": "0x0",
