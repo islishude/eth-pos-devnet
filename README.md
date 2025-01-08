@@ -65,8 +65,12 @@ make start
 - 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24 [EIP-1820](https://eips.ethereum.org/EIPS/eip-1820) Pseudo-introspection Registry Contract
 - 0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2 [Create2Deployer](https://optimistic.etherscan.io/address/0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2#code)
 - 0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02 [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) Beacon Roots contract
+- 0x0F792be4B0c0cb4DAE440Ef133E90C0eCD48CCCC [EIP-2935](https://eips.ethereum.org/EIPS/eip-2935) Serve historical block hashes from state
+- 0x0c15F14308530b7CDB8460094BbB9cC28b9AaaAA [EIP-7002](https://eips.ethereum.org/EIPS/eip-7002) Execution layer triggerable withdrawals
+- 0x00431F263cE400f4455c2dCf564e53007Ca4bbBb [EIP-7251](https://eips.ethereum.org/EIPS/eip-7251) Increase the MAX_EFFECTIVE_BALANCE
 - 0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed [CreateX](https://github.com/pcaversaccio/createx)
 - 0xcA11bde05977b3631167028862bE2a173976CA11 [Multicall3](https://www.multicall3.com/)
+- 0x000000000022D473030F116dDEE9F6B43aC78BA3 [Permit2](https://github.com/Uniswap/permit2)
 
 ## Custom block pruducing period
 
