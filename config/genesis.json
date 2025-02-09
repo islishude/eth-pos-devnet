@@ -16,6 +16,7 @@
     "grayGlacierBlock": 0,
     "shanghaiTime": 0,
     "cancunTime": 0,
+    "pragueTime": 0,
     "terminalTotalDifficulty": 0,
     "depositContractAddress": "0x00000000219ab540356cbb839cbe05303d7705fa",
     "blobSchedule": {
