@@ -1,5 +1,4 @@
 init:
-	docker-compose pull
 	docker-compose -f docker-compose-init.yaml up
 	docker-compose -f docker-compose-init.yaml down
 
@@ -12,3 +11,4 @@ stop:
 
 reset: stop
 	rm -Rf ./data
+	sleep 1

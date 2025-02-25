@@ -19,7 +19,7 @@ services:
     command:
       - testnet
       - generate-genesis
-      - --fork=deneb
+      - --fork=electra
       - --num-validators=1
       - --genesis-time-delay=10
       - --chain-config-file=/config/config.yml
@@ -34,11 +34,23 @@ services:
       custom-geth-genesis:
         condition: service_completed_successfully
 
+  fix-geth-genesis:
+    image: "node:22-alpine"
+    working_dir: /genesis
+    volumes:
+      - ./data/geth:/geth
+      - ./genesis:/genesis:ro
+    entrypoint: ["node", "fix.mjs"]
+    depends_on:
+      create-beacon-chain-genesis:
+        condition: service_completed_successfully
+
   init-geth-genesis:
-    image: "ethereum/client-go:v1.15.1"
+    image: "ethereum/client-go:v1.15.2"
     command: init --cache.preimages=true --state.scheme=hash --datadir /geth /geth/genesis.json
     volumes:
       - ./data/geth:/geth
     depends_on:
-      create-beacon-chain-genesis:
+      # create-beacon-chain-genesis:
+      fix-geth-genesis:
         condition: service_completed_successfully

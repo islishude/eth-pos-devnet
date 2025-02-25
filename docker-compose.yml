@@ -2,7 +2,7 @@ name: devnet
 
 services:
   geth:
-    image: "ethereum/client-go:v1.15.1"
+    image: "ethereum/client-go:v1.15.2"
     command:
       - --networkid=48815
       - --nodiscover
@@ -28,13 +28,12 @@ services:
     logging:
       driver: "local"
 
-  beacon-chain:
+  prysm:
     image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v5.3.0"
     command:
       - --datadir=/prysm/beacondata
       - --min-sync-peers=0
       - --genesis-state=/prysm/genesis.ssz
-      - --bootstrap-node=
       - --interop-eth1data-votes
       - --chain-config-file=/config/config.yml
       - --contract-deployment-block=0
