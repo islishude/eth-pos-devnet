@@ -15,7 +15,7 @@ services:
     entrypoint: ["node", "index.mjs"]
 
   create-beacon-chain-genesis:
-    image: "gcr.io/prysmaticlabs/prysm/cmd/prysmctl:v5.3.0"
+    image: "gcr.io/prysmaticlabs/prysm/cmd/prysmctl:v5.3.1"
     command:
       - testnet
       - generate-genesis
@@ -34,23 +34,11 @@ services:
       custom-geth-genesis:
         condition: service_completed_successfully
 
-  fix-geth-genesis:
-    image: "node:22-alpine"
-    working_dir: /genesis
-    volumes:
-      - ./data/geth:/geth
-      - ./genesis:/genesis:ro
-    entrypoint: ["node", "fix.mjs"]
-    depends_on:
-      create-beacon-chain-genesis:
-        condition: service_completed_successfully
-
   init-geth-genesis:
-    image: "ethereum/client-go:v1.15.2"
+    image: "ethereum/client-go:v1.15.5"
     command: init --cache.preimages=true --state.scheme=hash --datadir /geth /geth/genesis.json
     volumes:
       - ./data/geth:/geth
     depends_on:
-      # create-beacon-chain-genesis:
-      fix-geth-genesis:
+      create-beacon-chain-genesis:
         condition: service_completed_successfully

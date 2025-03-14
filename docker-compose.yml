@@ -2,7 +2,7 @@ name: devnet
 
 services:
   geth:
-    image: "ethereum/client-go:v1.15.2"
+    image: "ethereum/client-go:v1.15.5"
     command:
       - --networkid=48815
       - --nodiscover
@@ -29,7 +29,7 @@ services:
       driver: "local"
 
   prysm:
-    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v5.3.0"
+    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v5.3.1"
     command:
       - --datadir=/prysm/beacondata
       - --min-sync-peers=0
@@ -57,16 +57,16 @@ services:
       driver: "local"
 
   validator:
-    image: "gcr.io/prysmaticlabs/prysm/validator:v5.3.0"
+    image: "gcr.io/prysmaticlabs/prysm/validator:v5.3.1"
     command:
-      - --beacon-rpc-provider=beacon-chain:4000
+      - --beacon-rpc-provider=prysm:4000
       - --datadir=/prysm/validatordata
       - --accept-terms-of-use
       - --interop-num-validators=1
       - --interop-start-index=0
       - --chain-config-file=/config/config.yml
     depends_on:
-      beacon-chain:
+      prysm:
         condition: service_started
     volumes:
       - ./data/prysm:/prysm
