@@ -2,10 +2,12 @@ name: devnet
 
 services:
   geth:
-    image: "ethereum/client-go:v1.15.5"
+    image: "ethereum/client-go:v1.15.9"
     command:
       - --networkid=48815
       - --nodiscover
+      - --miner.recommit=1s
+      - --gcmode=archive
       - --http
       - --http.api=eth,net,web3,debug,txpool
       - --http.addr=0.0.0.0
@@ -15,11 +17,6 @@ services:
       - --ws.api=eth,net,web3,debug,txpool
       - --ws.addr=0.0.0.0
       - --ws.origins=*
-      - --syncmode=full
-      - --gcmode=archive
-      - --state.scheme=hash
-      - --history.transactions=0
-      - --history.state=0
     ports:
       - 8545:8545
       - 8546:8546
@@ -29,7 +26,7 @@ services:
       driver: "local"
 
   prysm:
-    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v5.3.1"
+    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v6.0.0"
     command:
       - --datadir=/prysm/beacondata
       - --min-sync-peers=0
@@ -57,7 +54,7 @@ services:
       driver: "local"
 
   validator:
-    image: "gcr.io/prysmaticlabs/prysm/validator:v5.3.1"
+    image: "gcr.io/prysmaticlabs/prysm/validator:v6.0.0"
     command:
       - --beacon-rpc-provider=prysm:4000
       - --datadir=/prysm/validatordata
