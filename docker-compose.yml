@@ -26,7 +26,7 @@ services:
       driver: "local"
 
   prysm:
-    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v6.0.1"
+    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v6.0.3"
     command:
       - --datadir=/prysm/beacondata
       - --min-sync-peers=0
@@ -54,7 +54,7 @@ services:
       driver: "local"
 
   validator:
-    image: "gcr.io/prysmaticlabs/prysm/validator:v6.0.1"
+    image: "gcr.io/prysmaticlabs/prysm/validator:v6.0.3"
     command:
       - --beacon-rpc-provider=prysm:4000
       - --datadir=/prysm/validatordata
