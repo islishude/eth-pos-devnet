@@ -2,12 +2,13 @@ name: devnet
 
 services:
   geth:
-    image: "ethereum/client-go:v1.15.11"
+    image: "ethereum/client-go:v1.16.1"
     command:
       - --networkid=48815
       - --nodiscover
       - --miner.recommit=1s
       - --gcmode=archive
+      - --state.scheme=hash
       - --http
       - --http.api=eth,net,web3,debug,txpool
       - --http.addr=0.0.0.0
