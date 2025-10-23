@@ -5,7 +5,7 @@ services:
     image: "ghcr.io/islishude/eth-genesis-generator:main"
     command:
       - --fork=fulu
-      - --num-validators=3
+      - --num-validators=64
       - --genesis-time-delay=5
       - --chain-config-file=/config/config.yml
       - --geth-genesis-json-in=/config/genesis.json
