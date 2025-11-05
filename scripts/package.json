@@ -1,0 +1,10 @@
+{
+  "name": "devnet-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Utility scripts to interact with the local PoS devnet",
+  "dependencies": {
+    "ethers": "^6.13.2"
+  }
+}
