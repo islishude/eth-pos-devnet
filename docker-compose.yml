@@ -5,7 +5,6 @@ services:
     image: "ethereum/client-go:v1.16.4"
     command:
       - --networkid=48815
-      - --nodiscover
       - --miner.recommit=1s
       - --gcmode=archive
       - --state.scheme=hash
@@ -23,6 +22,50 @@ services:
       - 8546:8546
     volumes:
       - ./data/geth:/root/.ethereum
+    logging:
+      driver: "local"
+
+  geth-2:
+    image: "ethereum/client-go:v1.16.4"
+    command:
+      - --networkid=48815
+      - --miner.recommit=1s
+      - --gcmode=archive
+      - --state.scheme=hash
+      - "--bootnodes=${EL_BOOTNODE}"
+      - --http
+      - --http.api=eth,net,web3,debug,txpool
+      - --http.addr=0.0.0.0
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --ws
+      - --ws.api=eth,net,web3,debug,txpool
+      - --ws.addr=0.0.0.0
+      - --ws.origins=*
+    volumes:
+      - ./data/geth-2:/root/.ethereum
+    logging:
+      driver: "local"
+
+  geth-3:
+    image: "ethereum/client-go:v1.16.4"
+    command:
+      - --networkid=48815
+      - --miner.recommit=1s
+      - --gcmode=archive
+      - --state.scheme=hash
+      - "--bootnodes=${EL_BOOTNODE}"
+      - --http
+      - --http.api=eth,net,web3,debug,txpool
+      - --http.addr=0.0.0.0
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --ws
+      - --ws.api=eth,net,web3,debug,txpool
+      - --ws.addr=0.0.0.0
+      - --ws.origins=*
+    volumes:
+      - ./data/geth-3:/root/.ethereum
     logging:
       driver: "local"
 
@@ -58,6 +101,70 @@ services:
     logging:
       driver: "local"
 
+  prysm-2:
+    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v6.1.2"
+    command:
+      - --datadir=/prysm/beacon
+      - --disable-monitoring
+      - --min-sync-peers=0
+      - --genesis-state=/sharedprysm/genesis.ssz
+      - --interop-eth1data-votes
+      - --bootstrap-node=${PRYSM_BOOTSTRAP_ENR}
+      - --chain-config-file=/config/config.yml
+      - --contract-deployment-block=0
+      - --chain-id=48815
+      - --execution-endpoint=/geth-2/geth.ipc
+      - --accept-terms-of-use
+      - --suggested-fee-recipient=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+      - --minimum-peers-per-subnet=0
+      - --http-host=0.0.0.0
+      - --http-port=3500
+      - --http-cors-domain=*
+      - --rpc-host=0.0.0.0
+      - --rpc-port=4000
+    depends_on:
+      geth-2:
+        condition: service_started
+    volumes:
+      - ./data/prysm-2:/prysm
+      - ./data/geth-2:/geth-2
+      - ./data/prysm:/sharedprysm:ro
+      - ./config/config.yml:/config/config.yml:ro
+    logging:
+      driver: "local"
+
+  prysm-3:
+    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v6.1.2"
+    command:
+      - --datadir=/prysm/beacon
+      - --disable-monitoring
+      - --min-sync-peers=0
+      - --genesis-state=/sharedprysm/genesis.ssz
+      - --interop-eth1data-votes
+      - --bootstrap-node=${PRYSM_BOOTSTRAP_ENR}
+      - --chain-config-file=/config/config.yml
+      - --contract-deployment-block=0
+      - --chain-id=48815
+      - --execution-endpoint=/geth-3/geth.ipc
+      - --accept-terms-of-use
+      - --suggested-fee-recipient=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+      - --minimum-peers-per-subnet=0
+      - --http-host=0.0.0.0
+      - --http-port=3500
+      - --http-cors-domain=*
+      - --rpc-host=0.0.0.0
+      - --rpc-port=4000
+    depends_on:
+      geth-3:
+        condition: service_started
+    volumes:
+      - ./data/prysm-3:/prysm
+      - ./data/geth-3:/geth-3
+      - ./data/prysm:/sharedprysm:ro
+      - ./config/config.yml:/config/config.yml:ro
+    logging:
+      driver: "local"
+
   validator:
     image: "gcr.io/prysmaticlabs/prysm/validator:v6.1.2"
     command:
@@ -72,6 +179,42 @@ services:
         condition: service_started
     volumes:
       - ./data/prysm:/prysm
+      - ./config/config.yml:/config/config.yml:ro
+    logging:
+      driver: "local"
+
+  validator-2:
+    image: "gcr.io/prysmaticlabs/prysm/validator:v6.1.2"
+    command:
+      - --beacon-rpc-provider=prysm-2:4000
+      - --datadir=/prysm/validator
+      - --accept-terms-of-use
+      - --interop-num-validators=1
+      - --interop-start-index=1
+      - --chain-config-file=/config/config.yml
+    depends_on:
+      prysm-2:
+        condition: service_started
+    volumes:
+      - ./data/prysm-2:/prysm
+      - ./config/config.yml:/config/config.yml:ro
+    logging:
+      driver: "local"
+
+  validator-3:
+    image: "gcr.io/prysmaticlabs/prysm/validator:v6.1.2"
+    command:
+      - --beacon-rpc-provider=prysm-3:4000
+      - --datadir=/prysm/validator
+      - --accept-terms-of-use
+      - --interop-num-validators=1
+      - --interop-start-index=2
+      - --chain-config-file=/config/config.yml
+    depends_on:
+      prysm-3:
+        condition: service_started
+    volumes:
+      - ./data/prysm-3:/prysm
       - ./config/config.yml:/config/config.yml:ro
     logging:
       driver: "local"

@@ -20,7 +20,7 @@ services:
       - testnet
       - generate-genesis
       - --fork=electra
-      - --num-validators=1
+      - --num-validators=3
       - --genesis-time-delay=10
       - --chain-config-file=/config/config.yml
       - --geth-genesis-json-in=/geth/genesis.json
@@ -39,6 +39,26 @@ services:
     command: init --cache.preimages=true --state.scheme=hash --datadir /geth /geth/genesis.json
     volumes:
       - ./data/geth:/geth
+    depends_on:
+      create-beacon-chain-genesis:
+        condition: service_completed_successfully
+
+  init-geth-genesis-2:
+    image: "ethereum/client-go:v1.16.4"
+    command: init --cache.preimages=true --state.scheme=hash --datadir /geth /shared-geth/genesis.json
+    volumes:
+      - ./data/geth-2:/geth
+      - ./data/geth:/shared-geth:ro
+    depends_on:
+      create-beacon-chain-genesis:
+        condition: service_completed_successfully
+
+  init-geth-genesis-3:
+    image: "ethereum/client-go:v1.16.4"
+    command: init --cache.preimages=true --state.scheme=hash --datadir /geth /shared-geth/genesis.json
+    volumes:
+      - ./data/geth-3:/geth
+      - ./data/geth:/shared-geth:ro
     depends_on:
       create-beacon-chain-genesis:
         condition: service_completed_successfully
