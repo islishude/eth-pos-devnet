@@ -13,7 +13,7 @@ async function fetchENR() {
   return enr.trim();
 }
 
-async function waitForENR(timeoutMs = 60_000) {
+async function waitForENR(timeoutMs = 180_000) {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     try {
