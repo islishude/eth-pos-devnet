@@ -2,7 +2,13 @@ name: devnet
 
 services:
   geth:
+    container_name: geth-1
     image: "ethereum/client-go:v1.16.4"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
     command:
       - --networkid=48815
       - --miner.recommit=1s
@@ -36,7 +42,13 @@ services:
       start_period: 1s
 
   geth-2:
+    container_name: geth-2
     image: "ethereum/client-go:v1.16.4"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
     command:
       - --networkid=48815
       - --miner.recommit=1s
@@ -70,7 +82,13 @@ services:
       start_period: 1s
 
   geth-3:
+    container_name: geth-3
     image: "ethereum/client-go:v1.16.4"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
     command:
       - --networkid=48815
       - --miner.recommit=1s
@@ -104,7 +122,14 @@ services:
       start_period: 1s
 
   prysm:
+    container_name: prysm-1
     image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v6.1.2"
+    # p2p ports + API
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
     command:
       - --datadir=/prysm/beacon
       - --disable-monitoring
@@ -125,6 +150,9 @@ services:
       - --rpc-host=0.0.0.0
       - --rpc-port=4000
     ports:
+      - 12000:12000/udp
+      - 13000:13000/udp
+      - 13000:13000
       - 3500:3500
     depends_on:
       geth:
@@ -137,7 +165,14 @@ services:
       driver: "local"
 
   prysm-2:
+    container_name: prysm-2
     image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v6.1.2"
+    # p2p ports + API
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
     command:
       - --datadir=/prysm/beacon
       - --disable-monitoring
@@ -147,7 +182,6 @@ services:
       - --genesis-state=/sharedprysm/genesis.ssz
       - --interop-eth1data-votes
       - --bootstrap-node=${PRYSM_BOOTSTRAP_ENR}
-      - --peer=${PRYSM_BOOTSTRAP_PEER}
       - --chain-config-file=/config/config.yml
       - --contract-deployment-block=0
       - --chain-id=48815
@@ -172,10 +206,20 @@ services:
     logging:
       driver: "local"
     ports:
+      - 12002:12000/udp
+      - 13002:13000/udp
+      - 13002:13000
       - 3502:3500
 
   prysm-3:
+    container_name: prysm-3
     image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v6.1.2"
+    # p2p ports + API
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
     command:
       - --datadir=/prysm/beacon
       - --disable-monitoring
@@ -185,7 +229,6 @@ services:
       - --genesis-state=/sharedprysm/genesis.ssz
       - --interop-eth1data-votes
       - --bootstrap-node=${PRYSM_BOOTSTRAP_ENR}
-      - --peer=${PRYSM_BOOTSTRAP_PEER}
       - --chain-config-file=/config/config.yml
       - --contract-deployment-block=0
       - --chain-id=48815
@@ -210,10 +253,19 @@ services:
     logging:
       driver: "local"
     ports:
+      - 12003:12000/udp
+      - 13003:13000/udp
+      - 13003:13000
       - 3503:3500
 
   validator:
+    container_name: validator-1
     image: "gcr.io/prysmaticlabs/prysm/validator:v6.1.2"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
     command:
       - --beacon-rpc-provider=prysm:4000
       - --datadir=/prysm/validator
@@ -231,7 +283,13 @@ services:
       driver: "local"
 
   validator-2:
+    container_name: validator-2
     image: "gcr.io/prysmaticlabs/prysm/validator:v6.1.2"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
     command:
       - --beacon-rpc-provider=prysm-2:4000
       - --datadir=/prysm/validator
@@ -249,7 +307,13 @@ services:
       driver: "local"
 
   validator-3:
+    container_name: validator-3
     image: "gcr.io/prysmaticlabs/prysm/validator:v6.1.2"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
     command:
       - --beacon-rpc-provider=prysm-3:4000
       - --datadir=/prysm/validator

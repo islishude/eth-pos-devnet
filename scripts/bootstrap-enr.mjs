@@ -18,7 +18,7 @@ async function waitForENR(timeoutMs = 180_000) {
     try {
       const data = await fetchIdentity();
       const enr = data?.enr;
-      if (enr && typeof enr === "string") return enr.trim();
+      if (enr && typeof enr === "string") return data; // return full identity data once ENR is available
     } catch (e) {
       await sleep(2000);
     }
@@ -56,7 +56,8 @@ function upsertEnvVar(path, key, value) {
 }
 
 async function main() {
-  const data = await fetchIdentity();
+  // Wait until Prysm exposes identity with ENR to avoid transient fetch errors (e.g., ECONNRESET)
+  const data = await waitForENR();
   if (!data) throw new Error("identity not available");
   const enrRaw = data.enr;
   const ip = getServiceContainerIp("prysm");

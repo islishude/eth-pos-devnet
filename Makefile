@@ -30,8 +30,8 @@ tx-no-wait:
 	npm --prefix ./scripts ci || npm --prefix ./scripts i
 	WAIT_FOR_RECEIPT=0 node ./scripts/send-tx.mjs
 
-# Convenience: full clean run (reset -> init -> start -> wait-el -> wait-cl(all) -> start-validators -> tx)
-fresh: reset init start wait-el wait-cl start-validators wait-el-head tx diagnose health
+# Convenience: full clean run (reset -> init -> start -> wait-el -> wait-cl(all) -> engine-seed -> start-validators -> tx)
+fresh: reset init start wait-el wait-cl engine-seed start-validators wait-el-head tx diagnose health
 # Consolidated health check (prints success message or reasons)
 health:
 	node ./scripts/check-health.mjs || true
