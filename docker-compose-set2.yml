@@ -1,0 +1,112 @@
+name: devnet
+
+services:
+  geth-2:
+    container_name: geth-2
+    image: "ethereum/client-go:v1.16.4"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
+    command:
+      - --networkid=48815
+      - --miner.recommit=1s
+      - --gcmode=archive
+      - --state.scheme=hash
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.port=8551
+      - --authrpc.vhosts=*
+      - --authrpc.jwtsecret=/root/.ethereum/geth/jwtsecret
+      - "--bootnodes=${EL_BOOTNODE}"
+      - --http
+      - --http.api=eth,net,web3,debug,txpool
+      - --http.addr=0.0.0.0
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --ws
+      - --ws.api=eth,net,web3,debug,txpool
+      - --ws.addr=0.0.0.0
+      - --ws.origins=*
+    volumes:
+      - ./data/geth-2:/root/.ethereum
+    logging:
+      driver: "local"
+    ports:
+      - 8547:8545
+    healthcheck:
+      test: ["CMD-SHELL", "test -s /root/.ethereum/geth/jwtsecret || exit 1"]
+      interval: 1s
+      timeout: 1s
+      retries: 120
+      start_period: 1s
+
+  prysm-2:
+    container_name: prysm-2
+    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v6.1.2"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
+    command:
+      - --datadir=/prysm/beacon
+      - --disable-monitoring
+      - --min-sync-peers=0
+      - --enable-debug-rpc-endpoints
+      - --checkpoint-sync-url=http://prysm:3500
+      - --genesis-state=/sharedprysm/genesis.ssz
+      - --interop-eth1data-votes
+      - --bootstrap-node=${PRYSM_BOOTSTRAP_ENR}
+      - --chain-config-file=/config/config.yml
+      - --contract-deployment-block=0
+      - --chain-id=48815
+      - --execution-endpoint=/geth-2/geth.ipc
+      - --jwt-secret=/geth-2/geth/jwtsecret
+      - --accept-terms-of-use
+      - --suggested-fee-recipient=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+      - --minimum-peers-per-subnet=0
+      - --http-host=0.0.0.0
+      - --http-port=3500
+      - --http-cors-domain=*
+      - --rpc-host=0.0.0.0
+      - --rpc-port=4000
+    depends_on:
+      geth-2:
+        condition: service_healthy
+    volumes:
+      - ./data/prysm-2:/prysm
+      - ./data/geth-2:/geth-2
+      - ./data/prysm:/sharedprysm:ro
+      - ./config/config.yml:/config/config.yml:ro
+    logging:
+      driver: "local"
+    ports:
+      - 12002:12000/udp
+      - 13002:13000/udp
+      - 13002:13000
+      - 3502:3500
+
+  validator-2:
+    container_name: validator-2
+    image: "gcr.io/prysmaticlabs/prysm/validator:v6.1.2"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 8G
+    command:
+      - --beacon-rpc-provider=prysm-2:4000
+      - --datadir=/prysm/validator
+      - --accept-terms-of-use
+      - --interop-num-validators=1
+      - --interop-start-index=1
+      - --chain-config-file=/config/config.yml
+    depends_on:
+      prysm-2:
+        condition: service_started
+    volumes:
+      - ./data/prysm-2:/prysm
+      - ./config/config.yml:/config/config.yml:ro
+    logging:
+      driver: "local"

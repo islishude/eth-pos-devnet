@@ -3,14 +3,19 @@ init:
 	docker compose -f docker-compose-init.yaml down
 
 start:
-	docker compose up -d geth prysm
+	# Start set1 (geth-1 + prysm-1), then bootstrap env for others
+	docker compose -f docker-compose-set1.yml up -d geth prysm
 	node ./scripts/bootstrap-enode.mjs
 	- node ./scripts/bootstrap-enr.mjs || true
-	docker compose up -d geth-2 geth-3 prysm-2 prysm-3
+	# Start set2 and set3 (geth-2/prysm-2, geth-3/prysm-3)
+	docker compose -f docker-compose-set2.yml up -d geth-2 prysm-2
+	docker compose -f docker-compose-set3.yml up -d geth-3 prysm-3
 
 stop:
 	docker compose -f docker-compose-init.yaml down
-	docker compose down
+	docker compose -f docker-compose-set3.yml down
+	docker compose -f docker-compose-set2.yml down
+	docker compose -f docker-compose-set1.yml down
 
 reset: stop
 	rm -Rf ./data
@@ -19,7 +24,9 @@ reset: stop
 # Start 3-node stack in proper order and write Prysm ENR into .env automatically.
 
 start-validators:
-	docker compose up -d validator validator-2 validator-3
+	docker compose -f docker-compose-set1.yml up -d validator
+	docker compose -f docker-compose-set2.yml up -d validator-2
+	docker compose -f docker-compose-set3.yml up -d validator-3
 
 # Send a sample transaction via ethers (uses local RPC :8545)
 tx:
