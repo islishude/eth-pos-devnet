@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import fetch from 'node-fetch';
 
 const endpoints = [
   { name: 'prysm', url: 'http://127.0.0.1:3500' },

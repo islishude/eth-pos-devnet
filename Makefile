@@ -2,8 +2,11 @@ init:
 	docker compose -f docker-compose-init.yaml up
 	docker compose -f docker-compose-init.yaml down
 
-start: start3
-	@true
+start:
+	docker compose up -d geth prysm
+	node ./scripts/bootstrap-enode.mjs
+	- node ./scripts/bootstrap-enr.mjs || true
+	docker compose up -d geth-2 geth-3 prysm-2 prysm-3
 
 stop:
 	docker compose -f docker-compose-init.yaml down
@@ -15,26 +18,15 @@ reset: stop
 
 # Start 3-node stack in proper order and write Prysm ENR into .env automatically.
 
-start3:
-	# 1) bring up base EL+CL (validatorsは後で起動)
-	docker compose up -d geth prysm
-	# 2) write EL bootnode and wait for Prysm ENR into .env
-	node ./scripts/bootstrap-enode.mjs
-	- node ./scripts/bootstrap-enr.mjs || true
-	# 3) bring up the rest using the now-populated .env (validatorsは後で起動)
-	docker compose up -d geth-2 geth-3 prysm-2 prysm-3
-
 start-validators:
-	 docker compose up -d validator validator-2 validator-3
+	docker compose up -d validator validator-2 validator-3
 
 # Send a sample transaction via ethers (uses local RPC :8545)
 tx:
-	# Ensure deps for scripts are installed
 	npm --prefix ./scripts ci || npm --prefix ./scripts i
 	node ./scripts/send-tx.mjs
 
 tx-no-wait:
-	# Ensure deps for scripts are installed
 	npm --prefix ./scripts ci || npm --prefix ./scripts i
 	WAIT_FOR_RECEIPT=0 node ./scripts/send-tx.mjs
 
@@ -92,10 +84,8 @@ wait-el-head:
 # Diagnose helpers
 diagnose:
 	@echo "== Consensus syncing =="
-	npx --yes node-fetch >/dev/null 2>&1 || true
 	node ./scripts/check-cl-sync.mjs || true
 	@echo "== Execution heads =="
 	node ./scripts/check-el-heads.mjs || true
 
-# Fresh run + immediate diagnostics in one step
-fresh-diagnose: fresh diagnose
+
