@@ -39,7 +39,38 @@ tx-no-wait:
 	WAIT_FOR_RECEIPT=0 node ./scripts/send-tx.mjs
 
 # Convenience: full clean run (reset -> init -> start -> wait-el -> wait-cl(all) -> start-validators -> tx)
-fresh: reset init start wait-el wait-cl start-validators wait-el-head tx
+fresh: reset init start wait-el wait-cl start-validators wait-el-head tx diagnose health
+# Consolidated health check (prints success message or reasons)
+health:
+	node ./scripts/check-health.mjs || true
+
+# Seed Engine API forkchoice at genesis on all ELs. Helps CL exit optimistic sooner.
+engine-seed:
+	docker run --rm \
+	  --network devnet_default \
+	  -v $$(pwd)/data:/data:ro \
+	  -v $$(pwd)/scripts:/scripts:ro \
+	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-3} \
+	  node:22-alpine node /scripts/engine-seed.mjs
+
+# Continuous seeding for several dozen slots (optional)
+engine-seed-cont:
+	docker run --rm \
+	  --network devnet_default \
+	  -e SEED_CONTINUOUS=1 \
+	  -e SEED_MAX_SLOTS=$${SEED_MAX_SLOTS:-60} \
+	  -e SEED_SLOTS=$${SEED_SLOTS:-3} \
+	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-3} \
+	  -v $$(pwd)/data:/data:ro \
+	  -v $$(pwd)/scripts:/scripts:ro \
+	  node:22-alpine node /scripts/engine-seed.mjs
+
+# Kickstart flow: seed forkchoice, restart CL to bind new head, then start validators, wait for EL head
+kickstart: engine-seed
+	docker compose restart prysm prysm-2 prysm-3
+	sleep 3
+	$(MAKE) start-validators
+	$(MAKE) wait-el-head
 
 # Quick sanity: print chainId and latest block from local EL
 check:
@@ -57,3 +88,14 @@ wait-cl:
 # Wait until any EL endpoint has blockNumber>0 (requires validators to be running)
 wait-el-head:
 	RPC_URLS="http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548" node ./scripts/wait-el-head.mjs
+
+# Diagnose helpers
+diagnose:
+	@echo "== Consensus syncing =="
+	npx --yes node-fetch >/dev/null 2>&1 || true
+	node ./scripts/check-cl-sync.mjs || true
+	@echo "== Execution heads =="
+	node ./scripts/check-el-heads.mjs || true
+
+# Fresh run + immediate diagnostics in one step
+fresh-diagnose: fresh diagnose

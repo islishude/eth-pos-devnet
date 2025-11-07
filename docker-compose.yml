@@ -142,9 +142,12 @@ services:
       - --datadir=/prysm/beacon
       - --disable-monitoring
       - --min-sync-peers=0
+      - --enable-debug-rpc-endpoints
+      - --checkpoint-sync-url=http://prysm:3500
       - --genesis-state=/sharedprysm/genesis.ssz
       - --interop-eth1data-votes
       - --bootstrap-node=${PRYSM_BOOTSTRAP_ENR}
+      - --peer=${PRYSM_BOOTSTRAP_PEER}
       - --chain-config-file=/config/config.yml
       - --contract-deployment-block=0
       - --chain-id=48815
@@ -177,9 +180,12 @@ services:
       - --datadir=/prysm/beacon
       - --disable-monitoring
       - --min-sync-peers=0
+      - --enable-debug-rpc-endpoints
+      - --checkpoint-sync-url=http://prysm:3500
       - --genesis-state=/sharedprysm/genesis.ssz
       - --interop-eth1data-votes
       - --bootstrap-node=${PRYSM_BOOTSTRAP_ENR}
+      - --peer=${PRYSM_BOOTSTRAP_PEER}
       - --chain-config-file=/config/config.yml
       - --contract-deployment-block=0
       - --chain-id=48815
