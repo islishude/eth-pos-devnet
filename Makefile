@@ -1,3 +1,4 @@
+SLOT := $(shell awk '/^SECONDS_PER_SLOT:/ {print $$2}' config/config.yml)
 init:
 	docker compose -f docker-compose-init.yaml up
 	docker compose -f docker-compose-init.yaml down
@@ -37,8 +38,48 @@ tx-no-wait:
 	npm --prefix ./scripts ci || npm --prefix ./scripts i
 	WAIT_FOR_RECEIPT=0 node ./scripts/send-tx.mjs
 
+# Simple forward-load using ethers v6 script
+
 # Convenience: full clean run (reset -> init -> start -> wait-el -> wait-cl(all) -> engine-seed -> start-validators -> tx)
 fresh: reset init start wait-el wait-cl engine-seed start-validators wait-el-head tx diagnose health
+
+# End-to-end: full bring-up then run load generator in one command
+# One-shot: fresh bring-up then run the default load parameters (env-overridable) in one command
+fresh-default-load:
+	$(MAKE) fresh
+	ENDPOINTS=$${ENDPOINTS:-"http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548"} \
+	TOTAL_TARGET_TPS=$${TOTAL_TARGET_TPS:-450} \
+	TOTAL_WORKERS=$${TOTAL_WORKERS:-300} \
+	DURATION_SEC=$${DURATION_SEC:-20} \
+	DIRECT_TRANSFER=$${DIRECT_TRANSFER:-1} \
+	ONLY_HTTP=$${ONLY_HTTP:-1} \
+	USE_RAW_SEND=$${USE_RAW_SEND:-1} \
+	FUND_WORKERS=$${FUND_WORKERS:-0} \
+	FUND_TOP_N=$${FUND_TOP_N:-0} \
+	RECEIPT_DRAIN_MS=$${RECEIPT_DRAIN_MS:-4000} \
+	BURST_MULTIPLIER=$${BURST_MULTIPLIER:-1} \
+	node ./scripts/load-parallel.mjs
+
+# Back-compat alias (uses default params, not "last chosen")
+fresh-last-load: fresh-default-load
+
+# High-gas fresh bring-up (override gasLimit via env)
+fresh-highgas:
+	$(MAKE) reset
+	GENESIS_GAS_LIMIT=$${GENESIS_GAS_LIMIT:-100000000} docker compose -f docker-compose-init.yaml up
+	docker compose -f docker-compose-init.yaml down
+	$(MAKE) start wait-el wait-cl engine-seed start-validators wait-el-head
+
+# Pre-populate worker accounts into genesis via .env then build & start
+genesis-fund-workers:
+	npm --prefix ./scripts ci || npm --prefix ./scripts i
+	COUNT=$${COUNT:-300} OFFSET=$${OFFSET:-0} ETH=$${ETH:-200} node ./scripts/genesis-fund-workers.mjs --count $$COUNT --offset $$OFFSET --eth $$ETH
+
+fresh-workers:
+	$(MAKE) reset
+	npm --prefix ./scripts ci || npm --prefix ./scripts i
+	COUNT=$${COUNT:-300} OFFSET=$${OFFSET:-0} ETH=$${ETH:-200} node ./scripts/genesis-fund-workers.mjs --count $$COUNT --offset $$OFFSET --eth $$ETH
+	$(MAKE) init start wait-el wait-cl engine-seed start-validators wait-el-head
 # Consolidated health check (prints success message or reasons)
 health:
 	node ./scripts/check-health.mjs || true
@@ -49,7 +90,7 @@ engine-seed:
 	  --network devnet_default \
 	  -v $$(pwd)/data:/data:ro \
 	  -v $$(pwd)/scripts:/scripts:ro \
-	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-3} \
+	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-$(SLOT)} \
 	  node:22-alpine node /scripts/engine-seed.mjs
 
 # Continuous seeding for several dozen slots (optional)
@@ -59,7 +100,7 @@ engine-seed-cont:
 	  -e SEED_CONTINUOUS=1 \
 	  -e SEED_MAX_SLOTS=$${SEED_MAX_SLOTS:-60} \
 	  -e SEED_SLOTS=$${SEED_SLOTS:-3} \
-	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-3} \
+	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-$(SLOT)} \
 	  -v $$(pwd)/data:/data:ro \
 	  -v $$(pwd)/scripts:/scripts:ro \
 	  node:22-alpine node /scripts/engine-seed.mjs

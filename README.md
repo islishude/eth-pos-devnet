@@ -58,6 +58,15 @@ make init
 make start
 ```
 
+**One-shot: fresh bring-up and run default load**
+
+```
+make fresh-default-load
+```
+このターゲットは `reset → init (genesis生成) → start → wait-el/CL → engine-seed → start-validators → wait-el-head → 既定値（環境変数で上書き可）の並列負荷` を一度に実行します。
+
+注: 互換のため `make fresh-last-load` も使用できます（別名）。いずれも「最後に選択した設定」ではなく、Makefile内の既定値（ENDPOINTS/TPS/WORKERS/DURATION 等）を使います。
+
 ## Genesis contract
 
 ### System
@@ -77,12 +86,12 @@ make start
 - 0xcA11bde05977b3631167028862bE2a173976CA11 [Multicall3](https://www.multicall3.com/)
 - 0x000000000022D473030F116dDEE9F6B43aC78BA3 [Permit2](https://github.com/Uniswap/permit2)
 
-## Custom block pruducing period
+## Custom block producing period
 
 Update it in the `config/config.yml`
 
 ```
-SECONDS_PER_SLOT: 3
+SECONDS_PER_SLOT: 2
 SLOTS_PER_EPOCH: 6
 ```
 

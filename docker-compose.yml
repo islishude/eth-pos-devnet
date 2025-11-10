@@ -74,6 +74,7 @@ services:
       driver: "local"
     ports:
       - 8547:8545
+      - 8549:8546
     healthcheck:
       test: ["CMD-SHELL", "test -s /root/.ethereum/geth/jwtsecret || exit 1"]
       interval: 1s
@@ -114,6 +115,7 @@ services:
       driver: "local"
     ports:
       - 8548:8545
+      - 8550:8546
     healthcheck:
       test: ["CMD-SHELL", "test -s /root/.ethereum/geth/jwtsecret || exit 1"]
       interval: 1s

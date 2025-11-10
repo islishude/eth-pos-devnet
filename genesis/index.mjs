@@ -18,6 +18,17 @@ const genesisFile = await fs.readFile("/config/genesis.json");
 
 const genesis = JSON.parse(genesisFile.toString());
 
+// Optional gasLimit override for higher per-block capacity
+if (env.GENESIS_GAS_LIMIT) {
+  try {
+    const hex = '0x' + BigInt(env.GENESIS_GAS_LIMIT).toString(16);
+    genesis.gasLimit = hex;
+    console.log('override gasLimit', hex);
+  } catch {
+    console.log('invalid GENESIS_GAS_LIMIT', env.GENESIS_GAS_LIMIT);
+  }
+}
+
 const alloc = {};
 
 for (const [address, value] of Object.entries(genesis.alloc || {})) {
