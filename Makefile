@@ -100,7 +100,6 @@ fresh-workers:
 	$(MAKE) start-validators
 	RPC_URLS="http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548" node ./scripts/wait-el-head.mjs
 
-# Time-series metrics sampling (latency, peers, txpool, beacon sync)
 metrics:
 	mkdir -p ./metrics
 	ENDPOINTS=$${ENDPOINTS:-http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548} \
