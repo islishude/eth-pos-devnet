@@ -1,5 +1,3 @@
-SLOT := $(shell awk '/^SECONDS_PER_SLOT:/ {print $$2}' config/config.yml)
-
 # Default load parameters (env-overridable)
 define LOAD_DEFAULT_ENV
 ENDPOINTS=$${ENDPOINTS:-"http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548"} \
@@ -50,7 +48,7 @@ fresh:
 	  --network devnet_default \
 	  -v $$(pwd)/data:/data:ro \
 	  -v $$(pwd)/scripts:/scripts:ro \
-	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-$(SLOT)} \
+	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-2} \
 	  node:22-alpine node /scripts/engine-seed.mjs
 	# Start validators and wait for EL head to advance
 	$(MAKE) start-validators
@@ -60,7 +58,7 @@ fresh:
 	node ./scripts/send-tx.mjs
 	node ./scripts/check-health.mjs || true
 
-fresh-default-load:
+fresh-load:
 	$(MAKE) fresh
 	$(LOAD_DEFAULT_ENV) node ./scripts/load-parallel.mjs
 
@@ -75,7 +73,7 @@ fresh-highgas:
 	  --network devnet_default \
 	  -v $$(pwd)/data:/data:ro \
 	  -v $$(pwd)/scripts:/scripts:ro \
-	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-$(SLOT)} \
+	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-2} \
 	  node:22-alpine node /scripts/engine-seed.mjs
 	$(MAKE) start-validators
 	RPC_URLS="http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548" node ./scripts/wait-el-head.mjs
@@ -96,7 +94,7 @@ fresh-workers:
 	  --network devnet_default \
 	  -v $$(pwd)/data:/data:ro \
 	  -v $$(pwd)/scripts:/scripts:ro \
-	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-$(SLOT)} \
+	  -e SECONDS_PER_SLOT=$${SECONDS_PER_SLOT:-2} \
 	  node:22-alpine node /scripts/engine-seed.mjs
 	$(MAKE) start-validators
 	RPC_URLS="http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548" node ./scripts/wait-el-head.mjs
