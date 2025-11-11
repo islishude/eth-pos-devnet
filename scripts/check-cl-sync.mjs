@@ -1,3 +1,3 @@
-// Removed legacy helper. Use scripts/metrics-sample2.mjs for observability.
-console.error('check-cl-sync.mjs is removed.');
-process.exit(1);
+#!/usr/bin/env node
+// removed: not used
+// (Deleted) Placeholder kept temporarily for safety. Will be removed.

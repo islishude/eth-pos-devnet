@@ -30,7 +30,6 @@ ELECTRA_FORK_EPOCH: 0
 FULU_FORK_VERSION: 0x20000095
 
 # Time parameters
-# Revert to stable slot duration to avoid Prysm panic
 SECONDS_PER_SLOT: 2
 SLOTS_PER_EPOCH: 6
 
