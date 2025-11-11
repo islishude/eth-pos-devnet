@@ -33,14 +33,11 @@ stop:
 reset: stop
 	rm -Rf ./data && sleep 1
 
-# Start 3-node stack in proper order and write Prysm ENR into .env automatically.
-
 start-validators:
 	docker compose -f docker-compose-set1.yml up -d validator
 	docker compose -f docker-compose-set2.yml up -d validator-2
 	docker compose -f docker-compose-set3.yml up -d validator-3
 
-# Full clean run (reset -> init -> start -> wait-el -> wait-cl -> engine-seed -> start-validators -> wait-el-head -> tx -> health)
 fresh:
 	$(MAKE) reset
 	$(MAKE) init
@@ -63,8 +60,6 @@ fresh:
 	node ./scripts/send-tx.mjs
 	node ./scripts/check-health.mjs || true
 
-# End-to-end: full bring-up then run load generator in one command
-# One-shot: fresh bring-up then run the default load parameters (env-overridable) in one command
 fresh-default-load:
 	$(MAKE) fresh
 	$(LOAD_DEFAULT_ENV) node ./scripts/load-parallel.mjs
@@ -85,7 +80,6 @@ fresh-highgas:
 	$(MAKE) start-validators
 	RPC_URLS="http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548" node ./scripts/wait-el-head.mjs
 
-# Pre-populate worker accounts into genesis via .env then build & start
 genesis-fund-workers:
 	npm --prefix ./scripts ci || npm --prefix ./scripts i
 	COUNT=$${COUNT:-300} OFFSET=$${OFFSET:-0} ETH=$${ETH:-200} node ./scripts/genesis-fund-workers.mjs --count $$COUNT --offset $$OFFSET --eth $$ETH
@@ -106,6 +100,3 @@ fresh-workers:
 	  node:22-alpine node /scripts/engine-seed.mjs
 	$(MAKE) start-validators
 	RPC_URLS="http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548" node ./scripts/wait-el-head.mjs
-# (Intentionally minimal command surface; auxiliary checks are run inside fresh)
-
-
