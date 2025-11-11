@@ -1,41 +1,23 @@
 name: devnet-genesis
 
 services:
-  custom-geth-genesis:
-    image: "node:22-alpine"
-    working_dir: /genesis
-    # 2.24.0 required
-    env_file:
-      - path: .env
-        required: false
-    volumes:
-      - ./genesis:/genesis
-      - ./data/geth:/geth
-      - ./config:/config:ro
-    entrypoint: ["node", "index.mjs"]
-
   create-beacon-chain-genesis:
-    image: "gcr.io/prysmaticlabs/prysm/cmd/prysmctl:v6.1.2"
+    image: "ghcr.io/islishude/eth-genesis-generator:main"
     command:
-      - testnet
-      - generate-genesis
-      - --fork=electra
-      - --num-validators=1
-      - --genesis-time-delay=10
+      - --fork=fulu
+      - --num-validators=64
+      - --genesis-time-delay=5
       - --chain-config-file=/config/config.yml
-      - --geth-genesis-json-in=/geth/genesis.json
+      - --geth-genesis-json-in=/config/genesis.json
       - --geth-genesis-json-out=/geth/genesis.json
       - --output-ssz=/prysm/genesis.ssz
     volumes:
       - ./data/geth:/geth
       - ./data/prysm:/prysm
-      - ./config/config.yml:/config/config.yml:ro
-    depends_on:
-      custom-geth-genesis:
-        condition: service_completed_successfully
+      - ./config:/config:ro
 
   init-geth-genesis:
-    image: "ethereum/client-go:v1.16.4"
+    image: "ethereum/client-go:v1.16.7"
     command: init --cache.preimages=true --state.scheme=hash --datadir /geth /geth/genesis.json
     volumes:
       - ./data/geth:/geth
