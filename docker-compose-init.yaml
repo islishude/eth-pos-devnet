@@ -17,7 +17,7 @@ services:
       - ./config:/config:ro
 
   init-geth-genesis:
-    image: "ethereum/client-go:v1.16.5"
+    image: "ethereum/client-go:v1.16.7"
     command: init --cache.preimages=true --state.scheme=hash --datadir /geth /geth/genesis.json
     volumes:
       - ./data/geth:/geth
