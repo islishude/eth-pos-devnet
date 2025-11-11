@@ -17,8 +17,7 @@ const __dirname = path.dirname(__filename);
 function resolveAbiPath() {
   const candidates = [
     path.resolve(__dirname, './contracts/build/SimpleForwarder.json'),
-    path.resolve(__dirname, '../contracts/build/SimpleForwarder.json'),
-    path.resolve(__dirname, '../caliper/contracts/build/SimpleForwarder.json')
+    path.resolve(__dirname, '../contracts/build/SimpleForwarder.json')
   ];
   for (const p of candidates) {
     try { fs.accessSync(p); return p; } catch { /* ignore */ }
@@ -52,15 +51,14 @@ const FUND_TARGET_ETH = process.env.WORKER_TARGET_ETH || '200';
 const FUND_WORKERS = process.env.FUND_WORKERS === '0' || process.env.FUND_WORKERS === 'false' ? false : true;
 const FUND_TOP_N = Number(process.env.FUND_TOP_N || WORKERS);
 const FUND_WAIT = process.env.FUND_WAIT === '0' || process.env.FUND_WAIT === 'false' ? false : true;
-const DEPLOYER_PK = process.env.DEPLOYER_PK || process.env.CONTRACT_DEPLOYER_PK ||
-  (loadNetwork().ethereum?.contractDeployerAddressPrivateKey || loadNetwork().ethereum?.fromAddressPrivateKey);
+const DEPLOYER_PK = process.env.DEPLOYER_PK || process.env.CONTRACT_DEPLOYER_PK;
 
 // Enforce contract address only when we actually call the contract
 // (DIRECT_TRANSFER=1 の場合は前方コントラクトを使わない)
 function ensureForwarderReadyIfNeeded(directTransfer) {
   if (directTransfer) return; // not needed
   if (!SIMPLE_FORWARDER_ADDRESS) {
-    console.error('Missing SimpleForwarder address. Set SIMPLE_FORWARDER_ADDRESS or provide caliper/networks/network.json');
+    console.error('Missing SimpleForwarder address. Set SIMPLE_FORWARDER_ADDRESS');
     process.exit(1);
   }
   if (!simpleIface) {
@@ -73,22 +71,7 @@ function ensureForwarderReadyIfNeeded(directTransfer) {
     simpleIface = new Interface(simpleAbi);
   }
 }
-
-function loadNetwork() {
-  try {
-    const p = path.resolve(__dirname, '../caliper/networks/network.json');
-    return JSON.parse(fs.readFileSync(p, 'utf8'));
-  } catch {
-    return {};
-  }
-}
-
-function resolveContractAddress() {
-  const net = loadNetwork();
-  const eth = net.ethereum || {};
-  const pre = eth.predeployedContracts || {};
-  return pre.SimpleForwarder?.address;
-}
+function resolveContractAddress() { return undefined; }
 
 // Provider factory with graceful fallback
 function createProvider(url) {

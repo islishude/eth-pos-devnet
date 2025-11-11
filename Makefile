@@ -1,4 +1,5 @@
 # Default load parameters (env-overridable)
+.PHONY: metrics
 define LOAD_DEFAULT_ENV
 ENDPOINTS=$${ENDPOINTS:-"http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548"} \
 TOTAL_TARGET_TPS=$${TOTAL_TARGET_TPS:-450} \
@@ -98,3 +99,12 @@ fresh-workers:
 	  node:22-alpine node /scripts/engine-seed.mjs
 	$(MAKE) start-validators
 	RPC_URLS="http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548" node ./scripts/wait-el-head.mjs
+
+# Time-series metrics sampling (latency, peers, txpool, beacon sync)
+metrics:
+	mkdir -p ./metrics
+	ENDPOINTS=$${ENDPOINTS:-http://127.0.0.1:8545,http://127.0.0.1:8547,http://127.0.0.1:8548} \
+	BEACON_URLS=$${BEACON_URLS:-http://127.0.0.1:3500,http://127.0.0.1:3502,http://127.0.0.1:3503} \
+	INTERVAL_MS=$${INTERVAL_MS:-1000} \
+	DURATION_SEC=$${DURATION_SEC:-0} \
+	node ./scripts/metrics-sample2.mjs
