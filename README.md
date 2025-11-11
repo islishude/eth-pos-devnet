@@ -65,8 +65,6 @@ make fresh-default-load
 ```
 このターゲットは `reset → init (genesis生成) → start → wait-el/CL → engine-seed → start-validators → wait-el-head → 既定値（環境変数で上書き可）の並列負荷` を一度に実行します。
 
-注: 互換のため `make fresh-last-load` も使用できます（別名）。いずれも「最後に選択した設定」ではなく、Makefile内の既定値（ENDPOINTS/TPS/WORKERS/DURATION 等）を使います。
-
 ## Genesis contract
 
 ### System
