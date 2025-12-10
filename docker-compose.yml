@@ -27,7 +27,7 @@ services:
       driver: "local"
 
   prysm:
-    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v7.0.1"
+    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:v7.1.0"
     command:
       - --datadir=/prysm/beacon
       - --disable-monitoring
@@ -59,7 +59,7 @@ services:
       driver: "local"
 
   validator:
-    image: "gcr.io/prysmaticlabs/prysm/validator:v7.0.1"
+    image: "gcr.io/prysmaticlabs/prysm/validator:v7.1.0"
     command:
       - --beacon-rpc-provider=prysm:4000
       - --datadir=/prysm/validator
