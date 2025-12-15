@@ -1,6 +1,6 @@
 # Ethereum Proof-of-Stake Devnet
 
-Fork from https://github.com/OffchainLabs/eth-pos-devnet and support Pectra(Prague/Electra) fork
+Fork from https://github.com/OffchainLabs/eth-pos-devnet and support Fusaka(Fulu/Osaka) fork
 
 Refer to https://docs.prylabs.network/docs/advanced/proof-of-stake-devnet for the details
 
