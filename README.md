@@ -6,7 +6,7 @@ Refer to https://docs.prylabs.network/docs/advanced/proof-of-stake-devnet for th
 
 ## Prerequisites
 
-- the `latest` docker-compose, the compose file requires version 2.24.0
+- the `latest` docker-compose
 
 ## Quick start
 
@@ -53,7 +53,6 @@ Update it in the `config/config.yml`
 
 ```
 SECONDS_PER_SLOT: 3
-SLOTS_PER_EPOCH: 6
 ```
 
 ## The fee recipient address for testing
