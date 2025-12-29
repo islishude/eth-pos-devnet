@@ -1,12 +1,8 @@
 # Ethereum Proof-of-Stake Devnet
 
-Fork from https://github.com/OffchainLabs/eth-pos-devnet and support Fusaka(Fulu/Osaka) fork
-
-Refer to https://docs.prylabs.network/docs/advanced/proof-of-stake-devnet for the details
-
 ## Prerequisites
 
-- the `latest` docker-compose
+- docker-compose
 
 ## Quick start
 
